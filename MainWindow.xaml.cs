@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,43 +29,113 @@ namespace WpfApp
 
 		private void Ellipse_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
-			double circleTransformTime = 0.5;
-			double circleMovingTime = 1;
-			double animDelays = 0.3;
-
-			//уменьшение круга
-			DoubleAnimation heightDownAnim = new DoubleAnimation();
-			heightDownAnim.From = 40;
-			heightDownAnim.To = 10;
-			heightDownAnim.Duration = TimeSpan.FromSeconds(circleTransformTime);
-			InnElem.BeginAnimation(HeightProperty, heightDownAnim);
-			InnElem.BeginAnimation(WidthProperty, heightDownAnim);
-
-			//перемещение круга
-			ThicknessAnimation ellipseMargin = new ThicknessAnimation();
-			ellipseMargin.From = InnElem.Margin;
-			ellipseMargin.To = new Thickness(55, 0, 0, 0);
-			ellipseMargin.BeginTime = TimeSpan.FromSeconds(circleTransformTime + animDelays);
-			ellipseMargin.Duration = TimeSpan.FromSeconds(circleMovingTime);
-			InnElem.BeginAnimation(MarginProperty, ellipseMargin);
-
-			//цвет бордера
-			ColorAnimation bordColor = new ColorAnimation();
-			ExtElem.Background = new SolidColorBrush(Colors.LightGray);
-			bordColor.From = Colors.LightGray;
-			bordColor.To = Colors.LightGreen;
-			bordColor.BeginTime = TimeSpan.FromSeconds(circleTransformTime + animDelays);
-			bordColor.Duration = TimeSpan.FromSeconds(circleMovingTime);
-			ExtElem.Background.BeginAnimation(SolidColorBrush.ColorProperty, bordColor);
-
-			//увеличение круга
-			DoubleAnimation heightUpAnim = new DoubleAnimation();
-			heightUpAnim.From = 10;
-			heightUpAnim.To = 40;
-			heightUpAnim.BeginTime = TimeSpan.FromSeconds(circleTransformTime + circleMovingTime + animDelays + animDelays);
-			heightUpAnim.Duration = TimeSpan.FromSeconds(circleTransformTime);
-			InnElem.BeginAnimation(HeightProperty, heightUpAnim);
-			InnElem.BeginAnimation(WidthProperty, heightUpAnim);
+			double circleTransformTime = 0.3;
+			double circleMovingTime = 0.5;
+			DoubleAnimation heightAnim = new DoubleAnimation();
+			heightAnim.From = InnElem.ActualHeight;
+			heightAnim.To = 10;
+			heightAnim.Duration = TimeSpan.FromSeconds(circleTransformTime);
+			heightAnim.Completed += delegate
+			{
+				ThicknessAnimation ellipseMargin = new ThicknessAnimation();
+				ellipseMargin.From = InnElem.Margin;
+				if (InnElem.Margin == new Thickness(55, 0, 0, 0))
+				{
+					ellipseMargin.To = new Thickness(0, 0, 55, 0);
+					//цвет бордера
+					ColorAnimation bordColor = new ColorAnimation();
+					ExtElem.Background = new SolidColorBrush(Colors.LightGray);
+					bordColor.From = Colors.LightGray;
+					bordColor.To = Colors.LightGreen;
+					bordColor.Duration = TimeSpan.FromSeconds(circleMovingTime);
+					ExtElem.Background.BeginAnimation(SolidColorBrush.ColorProperty, bordColor);
+				}
+				else
+				{
+					ellipseMargin.To = new Thickness(55, 0, 0, 0);
+					//цвет бордера
+					ColorAnimation bordColor = new ColorAnimation();
+					ExtElem.Background = new SolidColorBrush(Colors.LightGreen);
+					bordColor.From = Colors.LightGreen;
+					bordColor.To = Colors.LightGray;
+					//bordColor.BeginTime = TimeSpan.FromSeconds(circleTransformTime);
+					bordColor.Duration = TimeSpan.FromSeconds(circleMovingTime);
+					ExtElem.Background.BeginAnimation(SolidColorBrush.ColorProperty, bordColor);
+				}
+				//ellipseMargin.BeginTime = TimeSpan.FromSeconds(circleTransformTime);
+				ellipseMargin.Duration = TimeSpan.FromSeconds(circleMovingTime);
+				ellipseMargin.Completed += delegate
+				{
+					DoubleAnimation heightUpAnim = new DoubleAnimation();
+					heightAnim.From = InnElem.ActualHeight;
+					heightAnim.To = 40;
+					heightAnim.Duration = TimeSpan.FromSeconds(circleTransformTime);
+					InnElem.BeginAnimation(HeightProperty, heightAnim);
+					InnElem.BeginAnimation(WidthProperty, heightAnim);
+				};
+				InnElem.BeginAnimation(MarginProperty, ellipseMargin);
+				
+			};
+			InnElem.BeginAnimation(HeightProperty, heightAnim);
+			InnElem.BeginAnimation(WidthProperty, heightAnim);
 		}
+		//private void EllipseMinimize(double minimizeTime)
+		//{
+		//	//уменьшение круга
+		//	DoubleAnimation heightAnim = new DoubleAnimation();
+		//	heightAnim.From = InnElem.ActualHeight;
+		//	heightAnim.To = 10;
+		//	heightAnim.Duration = TimeSpan.FromSeconds(minimizeTime);
+		//	InnElem.BeginAnimation(HeightProperty, heightAnim);
+		//	InnElem.BeginAnimation(WidthProperty, heightAnim);
+		//}
+		//private void EllipseMaximize(double maximizeTime)
+		//{
+		//	DoubleAnimation heightAnim = new DoubleAnimation();
+		//	heightAnim.From = InnElem.ActualHeight;
+		//	heightAnim.To = 40;
+		//	heightAnim.Duration = TimeSpan.FromSeconds(maximizeTime);
+		//	InnElem.BeginAnimation(HeightProperty, heightAnim);
+		//	InnElem.BeginAnimation(WidthProperty, heightAnim);
+		//}
+		//private void EllipseMove(double movingTime)
+		//{
+		//	//перемещение круга
+		//	ThicknessAnimation ellipseMargin = new ThicknessAnimation();
+		//	ellipseMargin.From = InnElem.Margin;
+		//	if(InnElem.Margin == new Thickness(55, 0, 0, 0))
+		//	{
+		//		ellipseMargin.To = new Thickness(0, 0, 55, 0);
+		//	}
+		//	else
+		//	{
+		//		ellipseMargin.To = new Thickness(55, 0, 0, 0);
+		//	}
+		//	//ellipseMargin.BeginTime = TimeSpan.FromSeconds(circleTransformTime);
+		//	ellipseMargin.Duration = TimeSpan.FromSeconds(movingTime);
+		//	InnElem.BeginAnimation(MarginProperty, ellipseMargin);
+		//}
+		//private void BorderColorToGreen(double ColorChangeTime)
+		//{
+		//	//цвет бордера
+		//	ColorAnimation bordColor = new ColorAnimation();
+		//	ExtElem.Background = new SolidColorBrush(Colors.LightGray);
+		//	bordColor.From = Colors.LightGray;
+		//	bordColor.To = Colors.LightGreen;
+		//	//bordColor.BeginTime = TimeSpan.FromSeconds(circleTransformTime);
+		//	bordColor.Duration = TimeSpan.FromSeconds(ColorChangeTime);
+		//	ExtElem.Background.BeginAnimation(SolidColorBrush.ColorProperty, bordColor);
+		//}
+		//private void BorderColorToGray(double ColorChangeTime)
+		//{
+		//	//цвет бордера
+		//	ColorAnimation bordColor = new ColorAnimation();
+		//	ExtElem.Background = new SolidColorBrush(Colors.LightGreen);
+		//	bordColor.From = Colors.LightGreen;
+		//	bordColor.To = Colors.LightGray;
+		//	//bordColor.BeginTime = TimeSpan.FromSeconds(circleTransformTime);
+		//	bordColor.Duration = TimeSpan.FromSeconds(ColorChangeTime);
+		//	ExtElem.Background.BeginAnimation(SolidColorBrush.ColorProperty, bordColor);
+		//}
 	}
 }

@@ -31,11 +31,12 @@
                 Background="LightGray"
                 CornerRadius="20"
                 x:Name="ExtElem">
-            <Ellipse Width="38" 
-                     Height="38" 
+            <Ellipse Width="40" 
+                     Height="40" 
                      Fill="White" 
                      Margin="0,0,55,0" 
-                     MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"/>
+                     MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                     x:Name="InnElem"/>
         </Border>
     </Grid>
 </Window>
